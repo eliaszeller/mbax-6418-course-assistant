@@ -12,7 +12,7 @@ def test_required_project_docs_exist():
 def test_example_configuration_contains_no_real_secret_shape():
     contents = (ROOT / ".env.example").read_text(encoding="utf-8")
     assert "replace-with-local-dummy-value" in contents
-    assert "BEGIN PRIVATE KEY" not in contents
+    assert "BEGIN " + "PRIVATE KEY" not in contents
 
 
 def test_course_materials_are_ignored():
