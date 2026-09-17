@@ -1,0 +1,24 @@
+name: Feature proposal
+description: Propose a scoped project task
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What user or engineering outcome should this deliver?
+    validations:
+      required: true
+  - type: textarea
+    id: completion
+    attributes:
+      label: Completion checks
+      description: List observable checks, including automated tests.
+    validations:
+      required: true
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Design and tradeoffs
+      description: Alternatives, risks, and evaluation plan.
+    validations:
+      required: true

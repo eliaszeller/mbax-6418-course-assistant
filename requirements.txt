@@ -1,0 +1,2 @@
+# Bootstrap test dependency. Runtime dependencies are selected and pinned per implementation branch.
+pytest

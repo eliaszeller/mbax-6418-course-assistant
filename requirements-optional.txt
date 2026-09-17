@@ -1,0 +1,5 @@
+# Candidate implementation dependencies; pin and move selected packages into requirements.txt after comparison.
+bm25s
+chromadb
+gradio
+langchain-text-splitters
