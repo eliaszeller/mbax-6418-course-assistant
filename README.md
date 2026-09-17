@@ -43,7 +43,7 @@ Canvas files
                          Python interface (planned Gradio)
 ```
 
-Class services at `dobolyi.com` (ports 9001 and above) may provide document parsing, vision-capable generation, text/visual embeddings, and multimodal reranking. Connection details are intentionally not stored here. Ask the project team for the current endpoint formats and credentials, then provide them through server-side environment variables or an ignored local configuration file.
+The class service map is documented in [`docs/class-services.md`](docs/class-services.md). The four supplied services use ports 9002–9005; endpoint adapters must follow the model cards and vLLM 0.29.0 conventions. Credentials are intentionally not stored here and must be supplied through server-side environment variables or an ignored local configuration file.
 
 ## Local setup
 
