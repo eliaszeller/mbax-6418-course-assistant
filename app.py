@@ -136,12 +136,13 @@ def grade(*values):
 
 CSS = """
 .gradio-container {max-width:1180px !important; margin:0 auto !important;}
-.hero {padding:30px 32px; border-radius:22px; background:linear-gradient(135deg,#111827,#292524); color:#fff; margin-bottom:18px;}
-.hero h1 {font-size:2.25rem; margin:0 0 8px; letter-spacing:-.03em;}
-.hero p {color:#e7e5e4; margin:0; font-size:1.05rem;}
-.eyebrow {font-size:.75rem; font-weight:700; letter-spacing:.14em; color:#fbbf24; text-transform:uppercase; margin-bottom:9px;}
-.statbar {display:flex; gap:22px; flex-wrap:wrap; margin-top:18px; color:#d6d3d1; font-size:.9rem;}
-.statbar strong {color:white;}
+.hero {padding:30px 32px; border-radius:22px; background:linear-gradient(135deg,#111827,#292524); color:#f8fafc !important; margin-bottom:18px;}
+.hero h1 {font-size:2.25rem; margin:0 0 8px; letter-spacing:-.03em; color:#f8fafc !important;}
+.hero p {color:#e7e5e4 !important; margin:0; font-size:1.05rem;}
+.hero .eyebrow {font-size:.75rem; font-weight:700; letter-spacing:.14em; color:#fbbf24 !important; text-transform:uppercase; margin-bottom:9px;}
+.hero .statbar {display:flex; gap:22px; flex-wrap:wrap; margin-top:18px; color:#d6d3d1 !important; font-size:.9rem;}
+.hero .statbar span {color:#d6d3d1 !important;}
+.hero .statbar strong {color:#f8fafc !important;}
 .panel {border:1px solid #e7e5e4 !important; border-radius:18px !important; padding:8px !important;}
 .answer-card {min-height:130px;}
 .status {font-size:.82rem; color:#78716c;}
@@ -216,6 +217,7 @@ with gr.Blocks(title="MBAX 6418 Course Assistant") as demo:
 demo.launch(
     server_name=os.getenv("GRADIO_SERVER_NAME", "0.0.0.0"),
     server_port=int(os.getenv("PORT", os.getenv("GRADIO_SERVER_PORT", "8060"))),
+    share=os.getenv("GRADIO_SHARE", "false").lower() in {"1", "true", "yes"},
     allowed_paths=[str(Path("data/index/assets").resolve())],
     theme=theme,
     css=CSS,

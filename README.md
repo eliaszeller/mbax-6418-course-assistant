@@ -62,6 +62,8 @@ Automated checks cover retrieval, citation enforcement, source hydration, fixed 
 
 A development defect and its reproduction, expected behavior, actual behavior, fix, and regression test are recorded in [`docs/bug-report-missing-information.md`](docs/bug-report-missing-information.md).
 
+The hero-banner contrast defect shown during UI review is documented separately in [`docs/bug-report-hero-contrast.md`](docs/bug-report-hero-contrast.md).
+
 The fixed seven-question set in `evaluation/questions.json` spans slides, two visual questions, the required meme, and one unanswerable question. Compare on the same files/questions:
 
 1. Lexical-only BM25 baseline.
