@@ -19,6 +19,8 @@ python app.py
 
 Open `http://127.0.0.1:8060`. Add files in the sidebar, select course material, optionally enter a topic, then ask a question or generate a quiz. Removing a material rewrites the searchable index and removes unused rendered assets. Uploading the same document again—even from another folder—is detected by content metadata and does not duplicate it.
 
+For public deployment, `Dockerfile` and `render.yaml` configure a Render web service. Add `CLASS_API_KEY` only through Render's secret environment-variable settings; never commit `.env`. Free services can sleep after inactivity and take approximately a minute to wake.
+
 Keep the class key only in `.env`. It is server-side and ignored by Git; never put a real key in UI code, screenshots, logs, tests, or commits. `.env.example` contains dummy placeholders.
 
 ## Accepted files and conversion
@@ -57,6 +59,8 @@ python -m unittest discover -s tests -v
 ```
 
 Automated checks cover retrieval, citation enforcement, source hydration, fixed answer keys, missing-information fallback, duplicate uploads from different paths, and removal from the searchable index. Manual checks still required before submission: light/dark UI, service outage behavior in-browser, direct PPTX conversion fidelity, the Week 2 “Vibe Coding on Prod” meme answer with its image, and quiz feedback with a source image.
+
+A development defect and its reproduction, expected behavior, actual behavior, fix, and regression test are recorded in [`docs/bug-report-missing-information.md`](docs/bug-report-missing-information.md).
 
 The fixed seven-question set in `evaluation/questions.json` spans slides, two visual questions, the required meme, and one unanswerable question. Compare on the same files/questions:
 

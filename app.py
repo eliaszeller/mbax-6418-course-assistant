@@ -214,8 +214,8 @@ with gr.Blocks(title="MBAX 6418 Course Assistant") as demo:
     gr.Markdown("Responses are constrained to retrieved course evidence. Always verify important claims against the displayed source.", elem_classes="status")
 
 demo.launch(
-    server_name=os.getenv("GRADIO_SERVER_NAME", "127.0.0.1"),
-    server_port=int(os.getenv("GRADIO_SERVER_PORT", "8060")),
+    server_name=os.getenv("GRADIO_SERVER_NAME", "0.0.0.0"),
+    server_port=int(os.getenv("PORT", os.getenv("GRADIO_SERVER_PORT", "8060"))),
     allowed_paths=[str(Path("data/index/assets").resolve())],
     theme=theme,
     css=CSS,

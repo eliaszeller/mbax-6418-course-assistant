@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: mbax-6418-course-assistant
+    runtime: docker
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: CLASS_API_KEY
+        sync: false
+      - key: CLASS_VISION_BASE_URL
+        value: http://dobolyi.com:9001/v1
+      - key: CLASS_VISION_MODEL
+        value: cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit
