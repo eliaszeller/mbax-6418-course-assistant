@@ -60,9 +60,7 @@ python -m unittest discover -s tests -v
 
 Automated checks cover retrieval, citation enforcement, source hydration, fixed answer keys, missing-information fallback, duplicate uploads from different paths, and removal from the searchable index. Manual checks still required before submission: light/dark UI, service outage behavior in-browser, direct PPTX conversion fidelity, the Week 2 “Vibe Coding on Prod” meme answer with its image, and quiz feedback with a source image.
 
-A development defect and its reproduction, expected behavior, actual behavior, fix, and regression test are recorded in [`docs/bug-report-missing-information.md`](docs/bug-report-missing-information.md).
-
-The hero-banner contrast defect shown during UI review is documented separately in [`docs/bug-report-hero-contrast.md`](docs/bug-report-hero-contrast.md).
+The missing-information, hero-contrast, and reactive-scope defects are consolidated with reproduction steps, expected and actual behavior, fixes, and verification in [`docs/bug-report.md`](docs/bug-report.md).
 
 The fixed seven-question set in `evaluation/questions.json` spans slides, two visual questions, the required meme, and one unanswerable question. Compare on the same files/questions:
 

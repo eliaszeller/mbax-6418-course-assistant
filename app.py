@@ -36,9 +36,25 @@ def refresh_library():
     assistant = CourseAssistant(library.chunks, OpenAICompatibleClient(Settings.from_env()))
 
 
+def scope_summary(selected_labels):
+    selected_materials = set(selected_values(selected_labels))
+    scoped = [chunk for chunk in library.chunks if chunk.material in selected_materials]
+    slide_count = len({(chunk.material, chunk.locator) for chunk in scoped})
+    material_count = len(selected_materials)
+    material_label = "lecture deck" if material_count == 1 else "lecture decks"
+    slide_label = "slide/page" if slide_count == 1 else "slides/pages"
+    record_label = "searchable record" if len(scoped) == 1 else "searchable records"
+    return f"""<section class='hero'><div class='eyebrow'>Leeds School of Business</div>
+    <h1>MBAX 6418 Course Assistant</h1>
+    <p>Ask grounded questions and practice with quizzes built from the original lecture materials.</p>
+    <div class='statbar'><span><strong>{material_count}</strong> {material_label}</span>
+    <span><strong>{slide_count}</strong> {slide_label}</span>
+    <span><strong>{len(scoped)}</strong> {record_label}</span></div></section>"""
+
+
 def add_uploads(files, current_selection):
     if not files:
-        return "Choose at least one supported file.", gr.update(), gr.update()
+        return "Choose at least one supported file.", gr.update(), gr.update(), scope_summary(current_selection)
     added, skipped, added_records = library.add([Path(str(uploaded)) for uploaded in files])
     refresh_library()
     labels = list(material_labels)
@@ -50,7 +66,8 @@ def add_uploads(files, current_selection):
         message = "No new files were indexed."
     if skipped:
         message += "\n\nSkipped: " + ", ".join(skipped)
-    return message, gr.update(choices=labels, value=selected), gr.update(choices=labels, value=[])
+    return (message, gr.update(choices=labels, value=selected),
+            gr.update(choices=labels, value=[]), scope_summary(selected))
 
 
 def remove_materials(labels, current_selection):
@@ -60,7 +77,8 @@ def remove_materials(labels, current_selection):
     choices = list(material_labels)
     selected = [label for label in (current_selection or []) if label in choices]
     message = f"Removed {len(targets)} material{'s' if len(targets) != 1 else ''} and {removed} searchable records."
-    return message, gr.update(choices=choices, value=selected), gr.update(choices=choices, value=[])
+    return (message, gr.update(choices=choices, value=selected),
+            gr.update(choices=choices, value=[]), scope_summary(selected))
 
 
 def selected_values(labels):
@@ -151,11 +169,7 @@ footer {display:none !important;}
 
 theme = gr.themes.Soft(primary_hue="orange", secondary_hue="gray", radius_size="lg")
 with gr.Blocks(title="MBAX 6418 Course Assistant") as demo:
-    gr.HTML("""<section class='hero'><div class='eyebrow'>Leeds School of Business</div>
-    <h1>MBAX 6418 Course Assistant</h1>
-    <p>Ask grounded questions and practice with quizzes built from the original lecture materials.</p>
-    <div class='statbar'><span><strong>4</strong> lecture decks</span><span><strong>125</strong> slides</span>
-    <span><strong>250</strong> text and visual records</span></div></section>""")
+    hero = gr.HTML(scope_summary(list(material_labels)))
 
     with gr.Row(equal_height=False):
         with gr.Column(scale=1, min_width=280):
@@ -179,8 +193,9 @@ with gr.Blocks(title="MBAX 6418 Course Assistant") as demo:
                 )
                 remove_picker = gr.Dropdown(list(material_labels), multiselect=True, label="Remove materials")
                 remove_button = gr.Button("Remove from library", variant="stop")
-                index_button.click(add_uploads, [uploads, selected], [upload_status, selected, remove_picker])
-                remove_button.click(remove_materials, [remove_picker, selected], [upload_status, selected, remove_picker])
+                index_button.click(add_uploads, [uploads, selected], [upload_status, selected, remove_picker, hero])
+                remove_button.click(remove_materials, [remove_picker, selected], [upload_status, selected, remove_picker, hero])
+                selected.change(scope_summary, selected, hero)
         with gr.Column(scale=3):
             with gr.Tabs():
                 with gr.Tab("Ask the course"):
