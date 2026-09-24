@@ -1,5 +1,4 @@
-# Candidate implementation dependencies; pin and move selected packages into requirements.txt after comparison.
-bm25s
-chromadb
-gradio
-langchain-text-splitters
+# Production retrieval adapters planned after the class service contracts are confirmed.
+bm25s>=0.2
+chromadb>=1.0
+langchain-text-splitters>=0.3

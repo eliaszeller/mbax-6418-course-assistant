@@ -1,0 +1,9 @@
+[
+  {"id":"q1","type":"text","question":"What is context in an LLM?","expected_material":"Week 2"},
+  {"id":"q2","type":"visual","question":"Find the Vibe Coding on Prod meme and summarize its warning.","expected_material":"Week 2"},
+  {"id":"q3","type":"text","question":"How does prompt caching affect time to first token?","expected_material":"Week 3"},
+  {"id":"q4","type":"visual","question":"What does the RAG architecture diagram show flowing into generation?","expected_material":"Week 5"},
+  {"id":"q5","type":"text","question":"Why does chunking matter in RAG?","expected_material":"Week 5"},
+  {"id":"q6","type":"text","question":"What is the difference between vibe coding and agentic coding?","expected_material":"Week 2"},
+  {"id":"q7","type":"unanswerable","question":"What will the exact final exam questions be?","expected_material":null}
+]

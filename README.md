@@ -1,85 +1,88 @@
-# Course Assistant
+# MBAX 6418 Course Assistant
 
-A Python course assistant that answers questions and generates practice quizzes from course materials downloaded from Canvas.
+A Python/Gradio app that answers questions and creates practice quizzes from uploaded course decks. Every supported claim is tied to an exact excerpt and page/slide image; missing information produces an explicit “not found” response.
 
-## Project goal
+![Hybrid multimodal RAG architecture](docs/architecture.svg)
 
-Build a grounded, multimodal course assistant that:
+## Quick start
 
-- accepts course files such as PDF, PPTX, DOCX, and common text formats;
-- preserves extracted text, source locations, and original page/slide images;
-- answers questions with hybrid retrieval using keyword, text-embedding, and visual-embedding search;
-- acknowledges missing information instead of inventing answers or citations;
-- generates fixed-answer multiple-choice quizzes with scores and explanations;
-- shows document/page/slide/section references with supporting excerpts or screenshots.
-
-## Collaboration model
-
-This repository is intentionally set up for parallel alternatives:
-
-1. Start from `main`.
-2. Create one branch per design, for example `team/<name>-baseline`.
-3. Keep changes scoped and include automated checks.
-4. Open a pull request describing tradeoffs, test results, and limitations.
-5. Compare branches against the same evaluation checklist before selecting a foundation.
-6. The selected implementation will be extended on `main` after review.
-
-Do not commit course files, API keys, endpoint credentials, generated indexes, or student data.
-
-## Planned architecture
-
-```text
-Canvas files
-  -> parser / page-slide renderer
-  -> text chunks + source metadata       visual page/slide records
-  -> keyword index + text vector index  visual vector index
-                  \                    /
-                   candidate merge + multimodal reranking
-                                |
-                 answer or quiz generation with evidence
-                                |
-                 schema validation + source-support checks
-                                |
-                         Python interface (planned Gradio)
-```
-
-The class service map is documented in [`docs/class-services.md`](docs/class-services.md). The four supplied services use ports 9002–9005; endpoint adapters must follow the model cards and vLLM 0.29.0 conventions. Credentials are intentionally not stored here and must be supplied through server-side environment variables or an ignored local configuration file.
-
-## Local setup
-
-The implementation is being developed incrementally. The expected setup is:
+Requirements: Python 3.11+, Poppler (`pdftoppm`), and LibreOffice (`soffice`) for rendering PowerPoint decks.
 
 ```bash
-python -m venv .venv
-# Windows: .venv\\Scripts\\activate
-# macOS/Linux: source .venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-pytest
+cp .env.example .env
+python scripts/build_index.py "/path/to/course files"
+python app.py
 ```
 
-Use dummy values in examples. Never place real keys in source, browser code, logs, screenshots, documentation, or test artifacts.
+Open `http://127.0.0.1:8060`. Add files in the sidebar, select course material, optionally enter a topic, then ask a question or generate a quiz. Removing a material rewrites the searchable index and removes unused rendered assets. Uploading the same document again—even from another folder—is detected by content metadata and does not duplicate it.
 
-## Supported input policy
+Keep the class key only in `.env`. It is server-side and ignored by Git; never put a real key in UI code, screenshots, logs, tests, or commits. `.env.example` contains dummy placeholders.
 
-The finished app will document its tested formats explicitly. The target set is PDF, PPTX, DOCX, TXT, and Markdown, with page/slide rendering where the format supports it. Unsupported or malformed files should receive a clear error rather than partial, untraceable ingestion.
+## Accepted files and conversion
 
-## Evidence policy
+| Input | Searchable text | Visual evidence |
+|---|---|---|
+| PDF | Per page | Rendered original page PNG |
+| PPTX / PPT / ODP | Per slide | LibreOffice → PDF → slide PNG |
+| DOCX | Per nonempty paragraph | Not rendered (limitation) |
+| Markdown / TXT | Per section | Not applicable |
 
-Every answer and quiz explanation must carry structured source records. A source record should identify the document, page/slide or section, a text excerpt or image reference, and enough metadata to reproduce the evidence. If retrieval does not support an answer, the assistant must say that the materials do not establish it.
+Maximum upload size is 150 MB per file. Visually inspect rendered pages after conversion, especially charts, fonts, and animations; animations become static. Scanned PDFs need OCR, which is not yet automatic.
 
-## Evaluation and status
+## Retrieval and generation
 
-The project is currently in repository setup. Add benchmark materials only when permitted by the course. Each design comparison should record:
+The repeatable offline baseline combines BM25-style lexical scoring and deterministic vector scoring while keeping text and visual records distinct. Relevant image records receive a visual-query boost. Candidate evidence—text plus original page images—is sent to the class vision model. The app validates structured `answer` and `sources` fields, allows only retrieved source IDs, and verifies excerpts occur in cited content.
 
-- retrieval configuration and model/service versions;
-- latency and failure behavior;
-- grounded-answer and citation-support checks;
-- quiz answer-key stability;
-- visual evidence coverage;
-- known limitations and unchecked cases.
+| Purpose | Endpoint | Model |
+|---|---|---|
+| Vision generation | `http://dobolyi.com:9001/v1/chat/completions` | `cyankiwi/Qwen3.6-35B-A3B-AWQ-4bit` |
+| Text embedding | `http://dobolyi.com:9002/v2/embed` | `nvidia/Nemotron-3-Embed-1B-BF16` |
+| Visual embedding | `http://dobolyi.com:9003/v1/embeddings` | `Qwen/Qwen3-VL-Embedding-2B` |
+| Multimodal reranking | `http://dobolyi.com:9004/rerank` | `Qwen/Qwen3-VL-Reranker-2B` |
+| Document parsing | `http://dobolyi.com:9005/v1/chat/completions` | `dots.mocr` |
 
-Screenshots and findings will be added to `docs/` as the interface becomes available.
+The vision-generation adapter is active. The offline hybrid index is the fallback when embedding or reranking services are unavailable. Production embedding/reranking adapters remain unchecked until their exact vLLM 0.29 request templates are exercised against the live class servers; this app does not silently invent a schema.
 
-## License
+## Quiz behavior
 
-TBD by the project team.
+Questions are generated only from retrieved evidence. The answer key is stored in server-side Gradio state and stays hidden until submission. Submission reports the score, correct answer, explanation, document, page/slide, and exact excerpt. Regenerating creates a new fixed key; changing a radio selection never changes it.
+
+## Testing and evaluation
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+Automated checks cover retrieval, citation enforcement, source hydration, fixed answer keys, missing-information fallback, duplicate uploads from different paths, and removal from the searchable index. Manual checks still required before submission: light/dark UI, service outage behavior in-browser, direct PPTX conversion fidelity, the Week 2 “Vibe Coding on Prod” meme answer with its image, and quiz feedback with a source image.
+
+The fixed seven-question set in `evaluation/questions.json` spans slides, two visual questions, the required meme, and one unanswerable question. Compare on the same files/questions:
+
+1. Lexical-only BM25 baseline.
+2. Hybrid keyword + text/visual vectors + multimodal reranking.
+
+Record answer correctness, source support, and latency for each question. Hybrid is the recommended production choice because visual questions need image similarity and reranking, but no comparative result is claimed until the live evaluation runs. Save raw results under `evaluation/results/` and add the resulting table here.
+
+## Submission checklist
+
+- [x] Python app; add, deduplicate, select, and remove materials.
+- [x] PDF/PPTX and supporting formats; source metadata and original rendered visuals preserved.
+- [x] Grounded multimodal answers, structured sources, validation, and missing-info fallback.
+- [x] Multiple-choice quizzes with fixed hidden keys, scoring, explanations, and excerpts.
+- [x] SVG architecture showing preparation, retrieval paths, reranking, services, and runtime.
+- [x] Automated core tests and seven-question evaluation set.
+- [ ] Run and record the two-approach comparison against live services.
+- [ ] Add two final screenshots: an answer with slide image and quiz feedback with sources.
+- [ ] Confirm the syllabus is included in the index.
+- [ ] Create/assign issues from `docs/github-issues.md`; use branches, commits, PRs, and teammate review.
+- [ ] Verify teammate repository access and submit the repository link.
+
+The unchecked items require live service runs, the team’s syllabus/repository, or teammate actions and must not be represented as complete.
+
+## Team workflow and limitations
+
+Use `docs/github-issues.md` as the backlog. Assign owners, work one issue per branch, attach tests to each pull request, and have another teammate review. An issue is a task record; a branch is an isolated line of work; a pull request is a proposed reviewed merge.
+
+DOCX paragraphs currently have no original-page screenshot. Scanned PDFs need OCR. Slide animations and video are static after conversion. The deterministic vector baseline is not a substitute for the class embedding services. Model outputs can still be wrong, so inspect the shown excerpt and original image.

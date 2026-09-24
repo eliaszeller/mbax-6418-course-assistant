@@ -1,0 +1,2 @@
+"""Course Assistant package."""
+

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Course assistant hybrid RAG architecture</title>
+  <desc id="desc">Documents are parsed into text and slide images, indexed separately, retrieved, reranked, and supplied to a vision language model for grounded answers and quizzes.</desc>
+  <style>.bg{fill:#fffaf2}.box{fill:white;stroke:#292524;stroke-width:2;rx:14}.head{font:700 20px system-ui;fill:#1c1917}.txt{font:15px system-ui;fill:#44403c}.arrow{stroke:#f97316;stroke-width:4;fill:none;marker-end:url(#a)}.lane{fill:#fff7ed;stroke:#fdba74;stroke-width:2;rx:18}</style>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#f97316"/></marker></defs>
+  <rect class="bg" width="1200" height="650"/>
+  <text class="head" x="50" y="52">MBAX 6418 Course Assistant · Hybrid multimodal RAG</text>
+  <rect class="box" x="50" y="100" width="180" height="120"/><text class="head" x="75" y="138">Course files</text><text class="txt" x="75" y="170">PDF · PPTX · DOCX</text><text class="txt" x="75" y="194">MD · TXT · ODP</text>
+  <path class="arrow" d="M230 160 H290"/>
+  <rect class="box" x="290" y="90" width="220" height="140"/><text class="head" x="315" y="128">Preparation</text><text class="txt" x="315" y="160">Parse + chunk text</text><text class="txt" x="315" y="184">Render original pages</text><text class="txt" x="315" y="208">Preserve source metadata</text>
+  <path class="arrow" d="M510 160 H570"/>
+  <rect class="lane" x="570" y="75" width="270" height="185"/><text class="head" x="595" y="110">Separate indexes</text><text class="txt" x="595" y="143">Keyword / BM25</text><text class="txt" x="595" y="171">Text embeddings · port 9002</text><text class="txt" x="595" y="199">Visual embeddings · port 9003</text><text class="txt" x="595" y="227">Local deterministic fallback</text>
+  <path class="arrow" d="M840 160 H900"/>
+  <rect class="box" x="900" y="100" width="245" height="120"/><text class="head" x="925" y="138">Candidate fusion</text><text class="txt" x="925" y="170">Merge + deduplicate</text><text class="txt" x="925" y="194">Rerank · port 9004</text>
+  <path class="arrow" d="M1020 220 V315"/>
+  <rect class="box" x="875" y="315" width="270" height="125"/><text class="head" x="900" y="353">Grounded generation</text><text class="txt" x="900" y="385">Vision LLM · port 9001</text><text class="txt" x="900" y="409">Best text + page images</text>
+  <path class="arrow" d="M875 378 H790"/>
+  <rect class="box" x="515" y="315" width="275" height="125"/><text class="head" x="540" y="353">Validation</text><text class="txt" x="540" y="385">Structured answer + sources</text><text class="txt" x="540" y="409">Excerpt and source-ID checks</text>
+  <path class="arrow" d="M515 378 H430"/>
+  <rect class="box" x="50" y="300" width="380" height="155"/><text class="head" x="75" y="338">Python / Gradio interface</text><text class="txt" x="75" y="370">Ask with page/slide evidence</text><text class="txt" x="75" y="397">Generate, answer, score quizzes</text><text class="txt" x="75" y="424">Add, deduplicate, remove materials</text>
+  <rect class="lane" x="50" y="510" width="1095" height="90"/><text class="head" x="75" y="545">Runtime and privacy</text><text class="txt" x="75" y="577">Python 3.11+ · Gradio · LibreOffice/Poppler · server-side environment variables · no keys in browser, logs, screenshots, tests, or GitHub</text>
+</svg>
